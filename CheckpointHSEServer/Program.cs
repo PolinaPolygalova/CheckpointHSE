@@ -10,7 +10,7 @@ namespace CheckpointHSEServer
     {
         static void Main(string[] args)
         {
-            
+            // Проверка гита
         }
     }
 }
