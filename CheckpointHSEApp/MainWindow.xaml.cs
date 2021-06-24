@@ -30,9 +30,9 @@ namespace CheckpointHSEApp
 
 
 
-        public void ChangePerson(object sender, EventArgs e)
+        public async void ChangePerson(object sender, EventArgs e)
         {
-            string info = /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image);
+            string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
             if (info != "Нет информации")
             {
                 //Функция на открытие двери
