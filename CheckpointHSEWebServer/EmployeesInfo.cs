@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.CognitiveServices.Vision.Face;
 using Microsoft.Azure.CognitiveServices.Vision.Face.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,10 +16,13 @@ namespace CheckpointHSEWebServer
         // From your Face subscription in the Azure portal, get your subscription key and endpoint.
         const string SUBSCRIPTION_KEY = "aacf702741784695807ec7d9d56b4e51";
         const string ENDPOINT = "https://checkpointhse.cognitiveservices.azure.com/";
+        const string RECOGNITION_MODEL3 = RecognitionModel.Recognition03;
 
         public static Dictionary<string, string> EmployeesNames { get; set; }
 
         static string personGroupId = Guid.NewGuid().ToString();
+
+        private static IFaceClient faceClient;
 
         public async static void Initialize(IServiceProvider serviceProvider)
         {
@@ -31,10 +35,9 @@ namespace CheckpointHSEWebServer
                 employees = await context.Employees.ToDictionaryAsync(k => k.Guid, v => v.Surname + " " + v.Name + " " + v.Patronymic);
             }
 
-            const string RECOGNITION_MODEL3 = RecognitionModel.Recognition03;
-
             // Authenticate.
             IFaceClient client = Authenticate(ENDPOINT, SUBSCRIPTION_KEY);
+            faceClient = client;
 
             //// Detect - get features from faces.
             //DetectFaceExtract(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
@@ -110,39 +113,45 @@ namespace CheckpointHSEWebServer
             Console.WriteLine();
 
         }
-        private static async Task<List<DetectedFace>> DetectFaceRecognize(IFaceClient faceClient, string url, string recognition_model)
+        private static async Task<List<DetectedFace>> DetectFaceRecognize(IFormFile file)
         {
             // Detect faces from image URL. Since only recognizing, use the recognition model 1.
             // We use detection model 3 because we are not retrieving attributes.
-            IList<DetectedFace> detectedFaces = await faceClient.Face.DetectWithUrlAsync(url, recognitionModel: recognition_model, detectionModel: DetectionModel.Detection03);
-            Console.WriteLine($"{detectedFaces.Count} face(s) detected from image `{Path.GetFileName(url)}`");
+            //IList<DetectedFace> detectedFaces = await faceClient.Face.DetectWithUrlAsync(url, recognitionModel: recognition_model, detectionModel: DetectionModel.Detection03);
+            IList<DetectedFace> detectedFaces = await faceClient.Face.DetectWithStreamAsync(file.OpenReadStream(), recognitionModel: RECOGNITION_MODEL3, detectionModel: DetectionModel.Detection03);
+            Console.WriteLine($"{detectedFaces.Count} face(s) detected from image `{file.FileName}`");
             return detectedFaces.ToList();
         }
 
-        //public static async Task<List<string>> IdentifyFacesAsync(IFaceClient client, string recognitionModel)
-        //{
-        //    List<string> identifiedPersonNames = new List<string>();
+        public static async Task<List<string>> IdentifyFacesAsync(IFormFile file)
+        {
+            List<string> identifiedPersonNames = new List<string>();
 
-        //    List<Guid?> sourceFaceIds = new List<Guid?>();
-        //    // Detect faces from source image url.
-        //    List<DetectedFace> detectedFaces = await DetectFaceRecognize(client, $"{url}{sourceImageFileName}", recognitionModel);
+            List<Guid> sourceFaceIds = new List<Guid>();
+            // Detect faces from source image url.
+            List<DetectedFace> detectedFaces = await DetectFaceRecognize(file);
 
-        //    // Add detected faceId to sourceFaceIds.
-        //    foreach (var detectedFace in detectedFaces) { sourceFaceIds.Add(detectedFace.FaceId.Value); }
+            // Add detected faceId to sourceFaceIds.
+            foreach (var detectedFace in detectedFaces)
+            { 
+                sourceFaceIds.Add(detectedFace.FaceId.Value); 
+            }
 
-        //    // Identify the faces in a person group. 
-        //    var identifyResults = await client.Face.IdentifyAsync((IList<Guid>)sourceFaceIds, personGroupId);
+            // Identify the faces in a person group. 
+            var identifyResults = await faceClient.Face.IdentifyAsync(sourceFaceIds, personGroupId);
 
-        //    foreach (var identifyResult in identifyResults)
-        //    {
-        //        Person person = await client.PersonGroupPerson.GetAsync(personGroupId, identifyResult.Candidates[0].PersonId);
-        //        Console.WriteLine($"Person '{person.Name}' is identified for face in: {sourceImageFileName} - {identifyResult.FaceId}," +
-        //            $" confidence: {identifyResult.Candidates[0].Confidence}.");
-        //        identifiedPersonNames.Add(person.Name);
-        //    }
-        //    Console.WriteLine();
-
-        //    return identifiedPersonNames;
-        //}
+            foreach (var identifyResult in identifyResults)
+            {
+                if (identifyResult.Candidates != null && identifyResult.Candidates.Count > 0)
+                {
+                    Person person = await faceClient.PersonGroupPerson.GetAsync(personGroupId, identifyResult.Candidates[0].PersonId);
+                    Console.WriteLine($"Person '{person.Name}' is identified for face in: {file.FileName} - {identifyResult.FaceId}," +
+                        $" confidence: {identifyResult.Candidates[0].Confidence}.");
+                    identifiedPersonNames.Add(person.Name);
+                }
+            }
+            Console.WriteLine();
+            return identifiedPersonNames;
+        }
     }    
 }

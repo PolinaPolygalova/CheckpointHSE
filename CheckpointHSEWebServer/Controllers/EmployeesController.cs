@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace CheckpointHSEWebServer.Controllers
 {
@@ -8,17 +9,10 @@ namespace CheckpointHSEWebServer.Controllers
     [Route("[controller]")]
     public class EmployeesController : ControllerBase
     {
-        private readonly ILogger<EmployeesController> _logger;
-
-        public EmployeesController(ILogger<EmployeesController> logger)
+        [HttpPost("RecognizePersons")]
+        public async Task<IEnumerable<string>> RecognizePersons([FromForm] IFormFile file)
         {
-            _logger = logger;
-        }
-
-        [HttpPost]
-        public IEnumerable<string> Post() //get picture
-        {
-            return new[] { "Вася", "Петя" };
+            return await EmployeesInfo.IdentifyFacesAsync(file);
         }
     }
 }
