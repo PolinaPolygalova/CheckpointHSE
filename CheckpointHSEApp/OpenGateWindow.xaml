@@ -1,0 +1,24 @@
+﻿<Window x:Class="CheckpointHSEApp.OpenGateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CheckpointHSEApp"
+        mc:Ignorable="d"
+        Title="Проход открыт" Height="210" Width="280" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" FontFamily="Arial" ResizeMode="NoResize" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Grid>
+        <Label x:Name="OpenLabel" Content="Проход открыт" Margin="81,31,10,43" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" VerticalAlignment="Center" />
+        <Button x:Name="OkButton" Content="ОК" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="28" Width="97" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="OkButton_Click"/>
+        <Image x:Name="OpenImage" HorizontalAlignment="Left" Height="61" Margin="23,0,0,0" VerticalAlignment="Center" Width="62" Source="OpenGate.png" RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="180.222"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
+    </Grid>
+</Window>
