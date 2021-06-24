@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEServer", "Chec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEClient", "CheckpointHSEClient\CheckpointHSEClient.csproj", "{F7501270-737F-4319-B8CF-F71C2082CE81}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckpointHSEApp", "CheckpointHSEApp\CheckpointHSEApp.csproj", "{92AD1C79-E819-4FCA-9343-479D2396916A}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEWebServer", "CheckpointHSEWebServer\CheckpointHSEWebServer.csproj", "{C3C09525-68A2-40EE-A9CA-5072A22213B3}"
 EndProject
 Global
@@ -23,6 +25,10 @@ Global
 		{F7501270-737F-4319-B8CF-F71C2082CE81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7501270-737F-4319-B8CF-F71C2082CE81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7501270-737F-4319-B8CF-F71C2082CE81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92AD1C79-E819-4FCA-9343-479D2396916A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92AD1C79-E819-4FCA-9343-479D2396916A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92AD1C79-E819-4FCA-9343-479D2396916A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92AD1C79-E819-4FCA-9343-479D2396916A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C3C09525-68A2-40EE-A9CA-5072A22213B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C3C09525-68A2-40EE-A9CA-5072A22213B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3C09525-68A2-40EE-A9CA-5072A22213B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
