@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing;
 using DirectShowLib;
 using Emgu.CV;
+using System.IO.Ports;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
 
@@ -18,13 +19,14 @@ namespace CheckpointHSEApp
         private static Emgu.CV.VideoCapture capture = null;
         private static DsDevice[] webCams = null;
         private int selectedCameraId = 0;
-        private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
 
         private static CascadeClassifier classifier = new CascadeClassifier("haarcascade_frontalface_alt_tree.xml");
 
         private System.Windows.Forms.PictureBox CameraPictureBox = new System.Windows.Forms.PictureBox();
         private System.Windows.Forms.PictureBox PersonPictureBox = new System.Windows.Forms.PictureBox();
         private double fps;
+
+        string[] ports = SerialPort.GetPortNames();
 
         //public delegate void NewPersonHandler();
         //public event NewPersonHandler PersonChanged;
@@ -49,6 +51,8 @@ namespace CheckpointHSEApp
         //        PersonInfoLabel.Content = "Нет информации";
         //    }
         //}
+
+        private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
 
         public static string Cut(string s, int beg, int end)
         {
