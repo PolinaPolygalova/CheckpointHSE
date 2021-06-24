@@ -8,6 +8,7 @@ using Emgu.CV;
 using System.IO.Ports;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
+using System.Windows.Threading;
 
 namespace CheckpointHSEApp
 {
@@ -19,40 +20,38 @@ namespace CheckpointHSEApp
         private static Emgu.CV.VideoCapture capture = null;
         private static DsDevice[] webCams = null;
         private int selectedCameraId = 0;
-
+        private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
         private static CascadeClassifier classifier = new CascadeClassifier("haarcascade_frontalface_alt_tree.xml");
-
         private System.Windows.Forms.PictureBox CameraPictureBox = new System.Windows.Forms.PictureBox();
         private System.Windows.Forms.PictureBox PersonPictureBox = new System.Windows.Forms.PictureBox();
         private double fps;
+        private DispatcherTimer timer = null;
 
-        string[] ports = SerialPort.GetPortNames();
 
-        //public delegate void NewPersonHandler();
-        //public event NewPersonHandler PersonChanged;
 
-        //public void OnPersonChanged()
-        //{
-        //    if (PersonChanged != null)
-        //    {
-        //        PersonChanged();
-        //    }
-        //}
 
-        //public void ChangeLabel()
-        //{
-        //    if (PersonPictureBox.Image != System.Drawing.Image.FromFile(@"C:\Users\Екатерина\source\repos\CheckpointHSEApp\SadSmile.png"))
-        //    {
-        //        string info = GetRandomInfo.Program.GetNameTry(PersonPictureBox.Image);
-        //        PersonInfoLabel.Content = info;
-        //    }
-        //    else
-        //    {
-        //        PersonInfoLabel.Content = "Нет информации";
-        //    }
-        //}
+        public void ChangePerson(object sender, EventArgs e)
+        {
+            string info = /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image);
+            if (info != "Нет информации")
+            {
+                //Функция на открытие двери
+            }
+            this.PersonInfoLabel.Content = info;
+        }
 
-        private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
+
+
+
+
+        private void InitializeTimer()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(ChangePerson);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
+            timer.Start();
+        }
+
 
         public static string Cut(string s, int beg, int end)
         {
@@ -63,6 +62,8 @@ namespace CheckpointHSEApp
             }
             return sNew;
         }
+
+
 
 
         public Image<Bgr, byte> DetectFace(Image<Bgr, byte> image)
@@ -88,7 +89,6 @@ namespace CheckpointHSEApp
                     PersonPictureBox.Image = bitmap.Clone(newFace, bitmap.PixelFormat);
                 }
                 catch { }
-                //OnPersonChanged();
             }
             else
             {
@@ -101,9 +101,9 @@ namespace CheckpointHSEApp
             return bitmap.ToImage<Bgr, byte>();
         }
 
+
         public MainWindow()
         {
-            //PersonChanged += ChangeLabel;
             InitializeComponent();
             CameraHost.Child = CameraPictureBox;
             PersonHost.Child = PersonPictureBox;
@@ -121,9 +121,11 @@ namespace CheckpointHSEApp
             }
 
         }
+        
 
         private void StartCameraButton_Click(object sender, RoutedEventArgs e)
         {
+            InitializeTimer();
             try
             {
                 if (webCams.Length == 0)
@@ -141,12 +143,8 @@ namespace CheckpointHSEApp
                     capture.Start();
                 }
             }
-            catch (Exception ex)
-            {
-                //MessageBoxLabel.Content = "Ошибка: " + ex.Message;
-            }
+            catch { }
         }
-
 
 
         private async void Capture_ImageGrabbed(object sender, EventArgs e)
@@ -159,11 +157,9 @@ namespace CheckpointHSEApp
                 fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
                 await Task.Delay(1000/Convert.ToInt16(fps));
             }
-            catch (Exception ex)
-            {
-                //MessageBoxLabel.Content = "Ошибка: " + ex.Message;
-            }
-}
+            catch { }
+        }
+
 
         private void StopCameraButton_Click(object sender, RoutedEventArgs e)
         {
@@ -174,16 +170,15 @@ namespace CheckpointHSEApp
                     capture.Pause();
                 }
             }
-            catch (Exception ex)
-            {
-                //MessageBoxLabel.Content = "Ошибка: " + ex.Message;
-            }
+            catch { }
         }
+
 
         private void GateOpenButton_Click(object sender, RoutedEventArgs e)
         {
             new OpenGateWindow().ShowDialog();
         }
+
 
         private void AddInfoButton_Click(object sender, RoutedEventArgs e)
         {
@@ -197,10 +192,12 @@ namespace CheckpointHSEApp
             }
         }
 
+
         private void CameraIDCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedCameraId = CameraIDCombobox.SelectedIndex;
         }
+
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
