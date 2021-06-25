@@ -104,6 +104,8 @@ namespace CheckpointHSEApp
 
         public MainWindow()
         {
+            SerialPort port;
+
             InitializeComponent();
             CameraHost.Child = CameraPictureBox;
             PersonHost.Child = PersonPictureBox;
