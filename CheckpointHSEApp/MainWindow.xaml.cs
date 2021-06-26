@@ -9,6 +9,7 @@ using Emgu.CV;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
 using DirectShowLib;
+using MessageBox = System.Windows.MessageBox;
 
 namespace CheckpointHSEApp
 {
@@ -42,86 +43,6 @@ namespace CheckpointHSEApp
         private DispatcherTimer timer = null;
 
 
-
-
-        //Вызов функции распознавания лица на изображении
-        public async void ChangePerson(object sender, EventArgs e)
-        {
-            //Получение информации о человеке на изображении
-            //string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
-            string info = "ААААААААА";
-            if (info != "Нет информации")
-            {
-                info += "\n\nПроход открыт";
-                //Функция на открытие двери
-                Open(mySearialPort, PortsСomboBox);
-            }
-
-            //Изменение информации на главном окне
-            PersonInfoLabel.Content = info;
-        }
-
-
-        //Инициализация таймера - временного промежутка между передачей изображения на функцию распознавания лиц
-        private void InitializeTimer()
-        {
-            timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(ChangePerson);
-            //Временной промежуток - 1 секунда
-            timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
-            timer.Start();
-        }
-
-
-        //Обрезка строки от начального индекса до конечного
-        public static string Cut(string s, int beg, int end)
-        {
-            string sNew = "";
-            for (int i = beg; i < end; i++)
-            {
-                sNew += s[i];
-            }
-            return sNew;
-        }
-
-
-        //Определение одного лица на входящем изображении
-        public Image<Bgr, byte> DetectFace(Image<Bgr, byte> image)
-        {
-            Bitmap bitmap = image.ToBitmap();
-            Image<Bgr, byte> grayImage = bitmap.ToImage<Bgr, byte>();
-            System.Drawing.Rectangle[] faces = classifier.DetectMultiScale(grayImage, 1.4, 0);
-            if (faces.Length > 0)
-            {
-                System.Drawing.Rectangle newFace = faces[0];
-                newFace.Height = Convert.ToInt32(newFace.Width * 1.33);
-                newFace.Y = newFace.Y - Convert.ToInt32(newFace.Height/4.7);
-
-                using (Graphics graphics = Graphics.FromImage(bitmap))
-                {
-                    using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.MintCream, 3))
-                    {
-                        graphics.DrawRectangle(pen, newFace);
-                    }
-                }
-                try
-                {
-                    PersonPictureBox.Image = bitmap.Clone(newFace, bitmap.PixelFormat);
-                }
-                catch { }
-            }
-            else
-            {
-                try
-                {
-                    PersonPictureBox.Image = System.Drawing.Image.FromFile(sadSmilePath);
-                }
-                catch { }
-            }
-            return bitmap.ToImage<Bgr, byte>();
-        }
-
-
         //Главное окно
         public MainWindow()
         {
@@ -152,7 +73,6 @@ namespace CheckpointHSEApp
                 StopCameraButton.IsEnabled = false;
             }
 
-
             //Получение списка доступных портов и занесение их в ComboBox
             ports = SerialPort.GetPortNames();            
             for (int i = 0; i < ports.Length; i++)
@@ -166,7 +86,6 @@ namespace CheckpointHSEApp
                 GateOpenButton.IsEnabled = false;
             }
         }
-
 
         //Попытка запуска камеры
         private void StartCameraButton_Click(object sender, RoutedEventArgs e)
@@ -188,9 +107,11 @@ namespace CheckpointHSEApp
                     capture.Start();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
-
 
         //Получение и вывод изображения с камеры
         private async void Capture_ImageGrabbed(object sender, EventArgs e)
@@ -206,59 +127,53 @@ namespace CheckpointHSEApp
                 fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
                 await Task.Delay(1000 / Convert.ToInt16(fps));
             }
-            catch { }
-        }
-
-
-        //Остановка камеры
-        private void StopCameraButton_Click(object sender, RoutedEventArgs e)
-        {
-            try
+            catch(Exception ex)
             {
-                if (capture != null)
-                {
-                    capture.Pause();
-                }
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-            catch { }
         }
 
 
-
+        //Попытка открыть турникет
         private void GateOpenButton_Click(object sender, RoutedEventArgs e)
         {
             if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
             {
-                new OpenGateWindow().ShowDialog();
                 Open(mySearialPort, PortsСomboBox);
+                new OpenGateWindow().ShowDialog();
             }
             else
             {
                 if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    new OpenGateWindow().ShowDialog();
                     Open(mySearialPort, PortsСomboBox);
+                    new OpenGateWindow().ShowDialog();
                 }
             }
         }
 
+
+        //Получение дополнительной информации
         private void AddInfoButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                new AdditionalInfoWindow(PersonPictureBox.Image, PersonInfoLabel.Content.ToString()).ShowDialog();
+                new AdditionalInfoWindow(PersonPictureBox.Image, PersonInfoLabel.Content.ToString(), mySearialPort, PortsСomboBox).ShowDialog();
             }
-            catch
+            catch (Exception ex)
             {
-                new AdditionalInfoWindow().ShowDialog();
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        //Изменение камеры
         private void CameraIDCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedCameraId = CameraIDCombobox.SelectedIndex;
         }
 
+
+        //Выход
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
             if (System.Windows.Forms.Application.MessageLoop)
@@ -271,19 +186,115 @@ namespace CheckpointHSEApp
             }
         }
 
-        #region Вспомагательные функции
-        private void Open(SerialPort port, System.Windows.Controls.ComboBox box)
+        #region Вспомагательные функции//Вызов функции распознавания лица на изображении
+        //Получение информации о человеке на изображении
+        public async void ChangePerson(object sender, EventArgs e)
+        {
+            //string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
+            string info = "ААААААААА";
+            if (info != "Нет информации")
+            {
+                info += "\n\nПроход открыт";
+                //Функция на открытие двери
+                Open(mySearialPort, PortsСomboBox);
+            }
+
+            //Изменение информации на главном окне
+            PersonInfoLabel.Content = info;
+        }
+
+        //Инициализация таймера - временного промежутка между передачей изображения на функцию распознавания лиц
+        private void InitializeTimer()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(ChangePerson);
+            //Временной промежуток - 1 секунда
+            timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+            timer.Start();
+        }
+
+        //Обрезка строки от начального индекса до конечного
+        public static string Cut(string s, int beg, int end)
+        {
+            string sNew = "";
+            for (int i = beg; i < end; i++)
+            {
+                sNew += s[i];
+            }
+            return sNew;
+        }
+
+        //Определение одного лица на входящем изображении
+        public Image<Bgr, byte> DetectFace(Image<Bgr, byte> image)
+        {
+            Bitmap bitmap = image.ToBitmap();
+            Image<Bgr, byte> grayImage = bitmap.ToImage<Bgr, byte>();
+            System.Drawing.Rectangle[] faces = classifier.DetectMultiScale(grayImage, 1.4, 0);
+            if (faces.Length > 0)
+            {
+                System.Drawing.Rectangle newFace = faces[0];
+                newFace.Height = Convert.ToInt32(newFace.Width * 1.33);
+                newFace.Y = newFace.Y - Convert.ToInt32(newFace.Height / 4.7);
+
+                using (Graphics graphics = Graphics.FromImage(bitmap))
+                {
+                    using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.MintCream, 3))
+                    {
+                        graphics.DrawRectangle(pen, newFace);
+                    }
+                }
+                try
+                {
+                    PersonPictureBox.Image = bitmap.Clone(newFace, bitmap.PixelFormat);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                try
+                {
+                    PersonPictureBox.Image = System.Drawing.Image.FromFile(sadSmilePath);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            return bitmap.ToImage<Bgr, byte>();
+        }
+
+        //Остановка камеры
+        private void StopCameraButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                port.PortName = PortsСomboBox.Text;
+                if (capture != null)
+                {
+                    capture.Pause();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        //Открытие турникета
+        public static void Open(SerialPort port, System.Windows.Controls.ComboBox ports)
+        {
+            try
+            {
+                port.PortName = ports.Text;
                 port.Open();
                 port.WriteLine("on");
-                box.IsEditable = false;
+                ports.IsEditable = false;
             }
             catch
             {
-                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
         #endregion
