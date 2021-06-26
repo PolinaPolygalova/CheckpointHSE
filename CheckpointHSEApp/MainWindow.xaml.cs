@@ -82,7 +82,6 @@ namespace CheckpointHSEApp
                 StopCameraButton.IsEnabled = false;
             }
 
-
             //Получение списка доступных портов и занесение их в ComboBox
             ports = SerialPort.GetPortNames();            
             for (int i = 0; i < ports.Length; i++)
@@ -118,7 +117,10 @@ namespace CheckpointHSEApp
                     capture.Start();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -292,14 +294,14 @@ namespace CheckpointHSEApp
         {
             try
             {
-                port.PortName = PortsСomboBox.Text;
+                port.PortName = ports.Text;
                 port.Open();
                 port.WriteLine("on");
-                box.IsEditable = false;
+                ports.IsEditable = false;
             }
             catch
             {
-                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

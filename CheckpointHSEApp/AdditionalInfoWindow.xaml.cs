@@ -16,7 +16,6 @@ namespace CheckpointHSEApp
         //Создание нового PictureBox
         private PictureBox PersonPictureBox = new PictureBox();
 
-
         public AdditionalInfoWindow(System.Drawing.Image image, string info)
         {
             InitializeComponent();
