@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using System.Drawing;
 using DirectShowLib;
 using Emgu.CV;
 using System.IO.Ports;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
-using System.Windows.Threading;
 
 namespace CheckpointHSEApp
 {
@@ -32,9 +32,11 @@ namespace CheckpointHSEApp
 
         public async void ChangePerson(object sender, EventArgs e)
         {
-            string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
+            //string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
+            string info = "АААААААААа";
             if (info != "Нет информации")
             {
+                info += "\n\nПроход открыт";
                 //Функция на открытие двери
             }
             this.PersonInfoLabel.Content = info;
@@ -105,7 +107,6 @@ namespace CheckpointHSEApp
         public MainWindow()
         {
             SerialPort port;
-
             InitializeComponent();
             CameraHost.Child = CameraPictureBox;
             PersonHost.Child = PersonPictureBox;

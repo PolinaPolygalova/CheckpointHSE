@@ -1,42 +1,36 @@
-﻿<Window x:Class="CheckpointHSEApp.MainWindow"
+﻿<Window x:Name="AppWindow" x:Class="CheckpointHSEApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CheckpointHSEApp"
         mc:Ignorable="d"
-        Title="Контрольно-пропускной пункт НИУ ВШЭ-Пермь" Height="595" Width="855" Background="Snow" FontFamily="Arial" ResizeMode= "CanResizeWithGrip">
-    <Grid ClipToBounds="True">
-        <Grid Margin="0,0,600,386"/>
-        <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Height="49" Width="417">
-            <Button x:Name="StartCameraButton" Content="Запустить камеру" HorizontalAlignment="Left" Margin="175,5,0,0" VerticalAlignment="Top" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="StartCameraButton_Click" Width="126" Height="24"/>
-            <Button x:Name="StopCameraButton" Content="Остановить камеру" HorizontalAlignment="Right" Margin="0,0,-30,20" VerticalAlignment="Bottom" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="StopCameraButton_Click" Width="125" Height="24" d:LayoutOverrides="HorizontalAlignment"/>
+        Title="Контрольно-пропускной пункт НИУ ВШЭ-Пермь" Background="Snow" FontFamily="Arial" ResizeMode= "CanResizeWithGrip" Width="1115" Height="573">
+    <Grid x:Name="MainGrid" ClipToBounds="True">
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Top" Height="49" Width="550">
+            <Button x:Name="StartCameraButton" Content="Запустить камеру" HorizontalAlignment="Left" Margin="175,0,0,0" VerticalAlignment="Center" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="StartCameraButton_Click" Width="161" Height="25"/>
+            <Button x:Name="StopCameraButton" Content="Остановить камеру" HorizontalAlignment="Left" Margin="341,0,0,0" VerticalAlignment="Center" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="StopCameraButton_Click" Width="160" Height="25"/>
         </Grid>
-        <Button x:Name="ExitButton" Content="Выход" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="ExitButton_Click" Height="26" Width="50"/>
+        <Button x:Name="ExitButton" Content="Выход" HorizontalAlignment="Right" Margin="0,10,11,0" VerticalAlignment="Top" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" FontFamily="Arial" Foreground="MidnightBlue" Click="ExitButton_Click" Height="25" Width="136"/>
 
-        <Border x:Name="NoInfoBorder" BorderThickness="1" BorderBrush="MidnightBlue" Margin="0,0,75,300" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="187" RenderTransformOrigin="0.5,0.5" Width="140">
-            <Image x:Name="NoInfoImage" Source="SadSmile.png"/>
+        <Border x:Name="PersonBorder" BorderThickness="1" BorderBrush="MidnightBlue" Margin="0,117,222,0" VerticalAlignment="Top" HorizontalAlignment="Right" Height="239" RenderTransformOrigin="0.5,0.5" Width="179">
+            <WindowsFormsHost  x:Name="PersonHost"/>
         </Border>
-        <Border x:Name="PersonBorder" BorderThickness="1" BorderBrush="MidnightBlue" Margin="0,0,75,300" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="187" RenderTransformOrigin="0.5,0.5" Width="140">
-            <WindowsFormsHost  x:Name="PersonHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        </Border>
-        <Button x:Name="GateOpenButton" Content="Открыть проход" HorizontalAlignment="Right" Margin="0,0,5,200" VerticalAlignment="Bottom" BorderBrush="MidnightBlue" Background="Lavender" FontSize="14" FontFamily="Arial" Foreground="MidnightBlue" Click="GateOpenButton_Click" FontWeight="Bold" Width="120" Height="25" d:LayoutOverrides="HorizontalAlignment"/>
-        <Label x:Name="PersonInfoLabel" HorizontalAlignment="Right" Margin="0,0,85,275" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" 
-               VerticalContentAlignment="Top" Foreground="MidnightBlue" FontFamily="Arial" FontSize="13" Content="Нет информации" Width="115" Height="25"/>
-        <Label x:Name="HeadingLabel" Content="Информация:" HorizontalAlignment="Right" Margin="0,0,100,500" VerticalAlignment="Bottom" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="MidnightBlue" FontFamily="Arial" FontSize="13" Width="95" Height="25"/>
+        <Button x:Name="GateOpenButton" Content="Открыть проход" HorizontalAlignment="Right" Margin="0,0,11,97" VerticalAlignment="Bottom" BorderBrush="MidnightBlue" Background="Lavender" FontSize="14" FontFamily="Arial" Foreground="MidnightBlue" Click="GateOpenButton_Click" FontWeight="Bold" Width="192" Height="50"/>
+        <Label x:Name="PersonInfoLabel" HorizontalAlignment="Right" Margin="0,117,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" 
+               VerticalContentAlignment="Center" Foreground="MidnightBlue" FontFamily="Arial" FontSize="13" Content="Нет информации" Width="207" Height="169"/>
+        <Label x:Name="HeadingLabel" Content="Информация:" HorizontalAlignment="Right" Margin="0,70,10,0" VerticalAlignment="Top" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Foreground="MidnightBlue" FontFamily="Arial" FontSize="14" Width="424" Height="35"/>
 
-        <Border BorderThickness="1" BorderBrush="MidnightBlue" Margin="5,50,305,5">
-            <Label x:Name="MessageBoxLabel" VerticalContentAlignment="Bottom" FontSize="13" Margin="-1,461,0,0"/>
-        </Border>
+        <Label x:Name="MessageBoxLabel" VerticalContentAlignment="Bottom" FontSize="13" Margin="0,0,10,10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Height="82" Width="192"/>
 
-        <Border BorderThickness="1" BorderBrush="MidnightBlue" Margin="5,50,305,5">
-            <WindowsFormsHost  x:Name="CameraHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <Border x:Name="CameraBorder" BorderThickness="1" BorderBrush="MidnightBlue" Margin="10,49,449,10" RenderTransformOrigin="0.5,0.5">
+            <WindowsFormsHost  x:Name="CameraHost" Margin="0,0,0,0"/>
         </Border>
 
-        <Button x:Name="AddInfoButton" Content="Подробнее" HorizontalAlignment="Right" Margin="0,0,5,250" VerticalAlignment="Bottom" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" 
-                FontFamily="Arial" Foreground="MidnightBlue" FontStyle="Italic" Click="AddInfoButton_Click" Width="75" Height="20" />
-        <ComboBox x:Name="CameraIDCombobox" HorizontalAlignment="Right" Margin="0,5,700,0" VerticalAlignment="Top" DataContext="Камера ID" SelectionChanged="CameraIDCombobox_SelectionChanged" 
+        <Button x:Name="AddInfoButton" Content="Подробнее" HorizontalAlignment="Right" Margin="0,330,10,0" VerticalAlignment="Top" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" 
+                FontFamily="Arial" Foreground="MidnightBlue" FontStyle="Italic" Click="AddInfoButton_Click" Width="110" Height="26" />
+        <ComboBox x:Name="CameraIDCombobox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" DataContext="Камера ID" SelectionChanged="CameraIDCombobox_SelectionChanged" 
                   SelectedIndex="0" FontSize="13" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="150" Height="25"/>
-        <ComboBox x:Name="PortsСomboBox" Height="25" Margin="554,354,151,200" Width="150" RenderTransformOrigin="0.51,2.162"/>
+        <ComboBox x:Name="PortsСomboBox" Height="25" Margin="0,0,222,122" Width="179" RenderTransformOrigin="0.51,2.162" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
