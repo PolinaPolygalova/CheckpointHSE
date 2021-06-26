@@ -19,19 +19,19 @@ namespace CheckpointHSEApp
     public partial class MainWindow : Window
     {
         //Поле, отвечающее за видео с подключенной камеры
-        private static Emgu.CV.VideoCapture capture = null;
+        private static VideoCapture capture = null;
         //Список подключенных веб-камер
         private static DsDevice[] webCams = null;
         //ID выбранной камеры
         private int selectedCameraId = 0;
 
         //Создание PictureBox для передачи видео на форму
-        private System.Windows.Forms.PictureBox CameraPictureBox = new System.Windows.Forms.PictureBox();
-        private System.Windows.Forms.PictureBox PersonPictureBox = new System.Windows.Forms.PictureBox();
+        private PictureBox CameraPictureBox = new PictureBox();
+        private PictureBox PersonPictureBox = new PictureBox();
 
         //Список подключенных портов
         private static string[] ports = null;
-        private static SerialPort mySearialPort = new SerialPort();
+        private static SerialPort mySearialPort;
 
         //Изображение, использующееся при отсутствии обнаруженного лица
         private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
@@ -144,7 +144,7 @@ namespace CheckpointHSEApp
             }
             else
             {
-                if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     Open(mySearialPort, PortsСomboBox);
                     new OpenGateWindow().ShowDialog();
@@ -182,7 +182,7 @@ namespace CheckpointHSEApp
             }
             else
             {
-                System.Environment.Exit(1);
+                Environment.Exit(1);
             }
         }
 
@@ -229,16 +229,16 @@ namespace CheckpointHSEApp
         {
             Bitmap bitmap = image.ToBitmap();
             Image<Bgr, byte> grayImage = bitmap.ToImage<Bgr, byte>();
-            System.Drawing.Rectangle[] faces = classifier.DetectMultiScale(grayImage, 1.4, 0);
+            Rectangle[] faces = classifier.DetectMultiScale(grayImage, 1.4, 0);
             if (faces.Length > 0)
             {
-                System.Drawing.Rectangle newFace = faces[0];
+                Rectangle newFace = faces[0];
                 newFace.Height = Convert.ToInt32(newFace.Width * 1.33);
                 newFace.Y = newFace.Y - Convert.ToInt32(newFace.Height / 4.7);
 
                 using (Graphics graphics = Graphics.FromImage(bitmap))
                 {
-                    using (System.Drawing.Pen pen = new System.Drawing.Pen(System.Drawing.Color.MintCream, 3))
+                    using (Pen pen = new Pen(Color.MintCream, 3))
                     {
                         graphics.DrawRectangle(pen, newFace);
                     }
@@ -256,7 +256,7 @@ namespace CheckpointHSEApp
             {
                 try
                 {
-                    PersonPictureBox.Image = System.Drawing.Image.FromFile(sadSmilePath);
+                    PersonPictureBox.Image = Image.FromFile(sadSmilePath);
                 }
                 catch (Exception ex)
                 {
@@ -287,7 +287,7 @@ namespace CheckpointHSEApp
         {
             try
             {
-                port.PortName = ports.Text;
+                port = new SerialPort(ports.Text, 9600);
                 port.Open();
                 port.WriteLine("on");
                 ports.IsEditable = false;
