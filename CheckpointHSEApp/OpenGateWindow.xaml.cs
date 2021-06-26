@@ -3,8 +3,12 @@
 namespace CheckpointHSEApp
 {
     /// <summary>
-    /// Логика взаимодействия для OpenGateWindow.xaml
+    /// Вызывается, чтобы оповестить об открытии прохода
+    /// 
+    /// Взаимодействует с MainWindow
     /// </summary>
+
+
     public partial class OpenGateWindow : Window
     {
         public OpenGateWindow()
