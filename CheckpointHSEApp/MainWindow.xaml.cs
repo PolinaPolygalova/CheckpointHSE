@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Forms;
 using System.Drawing;
-using DirectShowLib;
-using Emgu.CV;
+using System.Windows.Threading;
 using System.IO.Ports;
+using Emgu.CV;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
-using System.Windows.Threading;
+using DirectShowLib;
+using MessageBox = System.Windows.MessageBox;
+using System.Windows.Forms;
 
 namespace CheckpointHSEApp
 {
@@ -19,30 +20,25 @@ namespace CheckpointHSEApp
     {
         private static Emgu.CV.VideoCapture capture = null;
         private static DsDevice[] webCams = null;
+        private static string[] ports = null;
+        private static SerialPort mySearialPort = new SerialPort();
         private int selectedCameraId = 0;
         private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
         private static CascadeClassifier classifier = new CascadeClassifier("haarcascade_frontalface_alt_tree.xml");
         private System.Windows.Forms.PictureBox CameraPictureBox = new System.Windows.Forms.PictureBox();
         private System.Windows.Forms.PictureBox PersonPictureBox = new System.Windows.Forms.PictureBox();
         private double fps;
-        private DispatcherTimer timer = null;
-
-
-
+        private DispatcherTimer timer = null; 
 
         public async void ChangePerson(object sender, EventArgs e)
         {
             string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
             if (info != "Нет информации")
             {
-                //Функция на открытие двери
+                Open(mySearialPort, PortsСomboBox, GateOpenButton);
             }
             this.PersonInfoLabel.Content = info;
         }
-
-
-
-
 
         private void InitializeTimer()
         {
@@ -51,7 +47,6 @@ namespace CheckpointHSEApp
             timer.Interval = new TimeSpan(0, 0, 0, 0, 1000);
             timer.Start();
         }
-
 
         public static string Cut(string s, int beg, int end)
         {
@@ -62,9 +57,6 @@ namespace CheckpointHSEApp
             }
             return sNew;
         }
-
-
-
 
         public Image<Bgr, byte> DetectFace(Image<Bgr, byte> image)
         {
@@ -101,11 +93,8 @@ namespace CheckpointHSEApp
             return bitmap.ToImage<Bgr, byte>();
         }
 
-
         public MainWindow()
         {
-            SerialPort port;
-
             InitializeComponent();
             CameraHost.Child = CameraPictureBox;
             PersonHost.Child = PersonPictureBox;
@@ -116,14 +105,19 @@ namespace CheckpointHSEApp
 
 
             webCams = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
+            ports = SerialPort.GetPortNames();
 
             for (int i = 0; i < webCams.Length; i++)
             {
                 CameraIDCombobox.Items.Add(webCams[i].Name);
             }
-
+            for (int i = 0; i < ports.Length; i++)
+            {
+                PortsСomboBox.Items.Add(ports[i]);
+            }
+            if (PortsСomboBox.Text == "")
+                GateOpenButton.IsEnabled = false;
         }
-        
 
         private void StartCameraButton_Click(object sender, RoutedEventArgs e)
         {
@@ -132,7 +126,7 @@ namespace CheckpointHSEApp
             {
                 if (webCams.Length == 0)
                 {
-                    throw new Exception("Нет доступных камер.");
+                    throw new Exception("Нет доступных камер!");
                 }
                 else if (capture != null)
                 {
@@ -148,7 +142,6 @@ namespace CheckpointHSEApp
             catch { }
         }
 
-
         private async void Capture_ImageGrabbed(object sender, EventArgs e)
         {            
             try
@@ -162,7 +155,6 @@ namespace CheckpointHSEApp
             catch { }
         }
 
-
         private void StopCameraButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -175,12 +167,31 @@ namespace CheckpointHSEApp
             catch { }
         }
 
-
         private void GateOpenButton_Click(object sender, RoutedEventArgs e)
         {
-            new OpenGateWindow().ShowDialog();
-        }
+            if ((string)GateOpenButton.Content == "Открыть проход")
+            {
+                if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
+                {
+                    Open(mySearialPort, PortsСomboBox, GateOpenButton);
+                    MessageBox.Show("Проход открыт", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    if (MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        Open(mySearialPort, PortsСomboBox, GateOpenButton);
+                        MessageBox.Show("Проход открыт", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+            }
+            else
+            {
+                Close(mySearialPort, PortsСomboBox, GateOpenButton);
+            }
 
+            //new OpenGateWindow().ShowDialog();
+        }
 
         private void AddInfoButton_Click(object sender, RoutedEventArgs e)
         {
@@ -194,12 +205,10 @@ namespace CheckpointHSEApp
             }
         }
 
-
         private void CameraIDCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedCameraId = CameraIDCombobox.SelectedIndex;
         }
-
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
@@ -212,5 +221,37 @@ namespace CheckpointHSEApp
                 System.Environment.Exit(1);
             }
         }
+
+        #region Вспомагательные функции
+        private void Open(SerialPort port, System.Windows.Controls.ComboBox box, System.Windows.Controls.Button but)
+        {
+            try
+            {
+                port.PortName = PortsСomboBox.Text;
+                port.Open();
+                port.WriteLine("on");
+                box.IsEditable = false;
+                but.Content = "Закрыть проход";
+            }
+            catch
+            {
+                MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        private void Close(SerialPort port, System.Windows.Controls.ComboBox box, System.Windows.Controls.Button but)
+        {
+            try
+            {
+                port.Close();
+                port.WriteLine("off");
+                box.IsEnabled = true;
+                but.Content = "Открыть проход";
+            }
+            catch
+            {
+                MessageBox.Show("Ошибка подключения!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+        #endregion
     }
 }

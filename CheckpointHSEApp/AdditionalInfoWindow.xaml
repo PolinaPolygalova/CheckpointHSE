@@ -23,7 +23,7 @@
         <Border BorderThickness="1" BorderBrush="MidnightBlue" Margin="20,21,0,0" Height="360" RenderTransformOrigin="0.5,0.5" Width="270" HorizontalAlignment="Left" VerticalAlignment="Top">
             <WindowsFormsHost  x:Name="PersonHost" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Border>
-        <Button x:Name="GateOpenButton" Content="Открыть проход" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="165" Height="34" BorderBrush="MidnightBlue" Background="Lavender" FontSize="14" FontFamily="Arial" Foreground="MidnightBlue" Click="GateOpenButton_Click" FontWeight="Bold"/>
+        <Button x:Name="GateOpenButton" Content="Открыть проход" HorizontalAlignment="Right" Margin="0,0,5,5" VerticalAlignment="Bottom" Width="120" Height="25" BorderBrush="MidnightBlue" Background="Lavender" FontSize="14" FontFamily="Arial" Foreground="MidnightBlue" Click="GateOpenButton_Click" FontWeight="Bold"/>
 
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Forms;
+using MessageBox = System.Windows.MessageBox;
 
 namespace CheckpointHSEApp
 {
@@ -25,7 +26,8 @@ namespace CheckpointHSEApp
 
         private void GateOpenButton_Click(object sender, RoutedEventArgs e)
         {
-            new OpenGateWindow().ShowDialog();
+            MessageBox.Show("Проход открыт", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+            //new OpenGateWindow().ShowDialog();
         }
     }
 }
