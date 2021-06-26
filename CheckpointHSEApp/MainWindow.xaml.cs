@@ -119,7 +119,7 @@ namespace CheckpointHSEApp
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -134,7 +134,10 @@ namespace CheckpointHSEApp
                     capture.Pause();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -154,7 +157,10 @@ namespace CheckpointHSEApp
                 window.Owner = this;
                 window.ShowDialog();
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -209,7 +215,10 @@ namespace CheckpointHSEApp
                 {
                     PersonPictureBox.Image = bitmap.Clone(newFace, bitmap.PixelFormat);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    System.Windows.MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
 
             //Если не обнаружено ни одного лица - ставится картинка "нет изображения"
@@ -278,7 +287,10 @@ namespace CheckpointHSEApp
                 fps = capture.GetCaptureProperty(Emgu.CV.CvEnum.CapProp.Fps);
                 await Task.Delay(1000 / Convert.ToInt16(fps));
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
 
@@ -294,14 +306,14 @@ namespace CheckpointHSEApp
         {
             try
             {
-                port.PortName = ports.Text;
+                port = new SerialPort(box.Text, 9600);
                 port.Open();
                 port.WriteLine("on");
-                ports.IsEditable = false;
+                box.IsEditable = false;
             }
             catch
             {
-                MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
