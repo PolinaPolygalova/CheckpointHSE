@@ -27,19 +27,19 @@ namespace CheckpointHSEApp
     public partial class MainWindow : Window
     {
         //Поле, отвечающее за видео с подключенной камеры
-        private static Emgu.CV.VideoCapture capture = null;
+        private static VideoCapture capture = null;
         //Список подключенных веб-камер
         private static DsDevice[] webCams = null;
         //ID выбранной камеры
         private int selectedCameraId = 0;
 
         //Создание PictureBox для передачи видео на форму
-        private System.Windows.Forms.PictureBox CameraPictureBox = new System.Windows.Forms.PictureBox();
-        private System.Windows.Forms.PictureBox PersonPictureBox = new System.Windows.Forms.PictureBox();
+        private PictureBox CameraPictureBox = new PictureBox();
+        private PictureBox PersonPictureBox = new PictureBox();
 
         //Список подключенных портов
         private static string[] ports = null;
-        private static SerialPort mySearialPort = new SerialPort();
+        private static SerialPort mySearialPort;
 
         //Изображение, использующееся при отсутствии обнаруженного лица
         private string sadSmilePath = Cut(Environment.CurrentDirectory, 0, Environment.CurrentDirectory.LastIndexOf("CheckpointHSEApp") + "CheckpointHSEApp".Length + 1) + @"\SadSmile.png";
