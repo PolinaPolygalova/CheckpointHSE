@@ -27,7 +27,7 @@
 
         <Button x:Name="AddInfoButton" Content="Подробнее" HorizontalAlignment="Right" Margin="0,330,10,0" VerticalAlignment="Top" BorderBrush="MidnightBlue" Background="Lavender" FontSize="13" 
                 FontFamily="Arial" Foreground="MidnightBlue" FontStyle="Italic" Click="AddInfoButton_Click" Width="110" Height="26" />
-        <ComboBox x:Name="CameraIDCombobox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" DataContext="Камера ID" SelectionChanged="CameraIDCombobox_SelectionChanged" FontSize="13" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="150" Height="25" SelectedIndex="0"/>
-        <ComboBox x:Name="PortsСomboBox" Height="25" Margin="0,0,222,122" Width="179" RenderTransformOrigin="0.51,2.162" HorizontalAlignment="Right" VerticalAlignment="Bottom" SelectedIndex="0" IsEnabled="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <ComboBox x:Name="CameraIDCombobox" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" DataContext="Камера ID" SelectionChanged="CameraIDCombobox_SelectionChanged" FontSize="13" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="150" Height="25"/>
+        <ComboBox x:Name="PortsСomboBox" Height="25" Margin="0,0,222,122" Width="179" RenderTransformOrigin="0.51,2.162" HorizontalAlignment="Right" VerticalAlignment="Bottom" IsEnabled="False" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
     </Grid>
 </Window>

@@ -237,12 +237,16 @@ namespace CheckpointHSEApp
         {
             //Получение информации о человеке на изображении
             //string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
-            string info = "ААААААААА";
-            if (info != "Нет информации")
+            string info = "";
+            if (info != "")
             {
                 info += "\n\nПроход открыт";
                 //Функция на открытие двери
                 Open(mySearialPort, PortsСomboBox);
+            }
+            else
+            {
+                info = "Нет информации";
             }
 
             //Изменение информации на главном окне

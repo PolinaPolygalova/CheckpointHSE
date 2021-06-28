@@ -36,6 +36,7 @@ namespace CheckpointHSEApp
         {
             var myObject = this.Owner as MainWindow;
             myObject.Opening();
+            this.Close();
         }
     }
 }
