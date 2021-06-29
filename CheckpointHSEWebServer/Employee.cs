@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace CheckpointHSEWebServer
 {
+    /// <summary>
+    /// Моделька
+    /// </summary>
     public class Employee
     {
         public string Name { get; set; }

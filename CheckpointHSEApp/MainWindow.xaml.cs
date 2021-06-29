@@ -9,6 +9,10 @@ using System.IO.Ports;
 using Emgu.CV.Structure;
 using CascadeClassifier = Emgu.CV.CascadeClassifier;
 using System.Windows.Threading;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
+using System.Drawing.Imaging;
 
 namespace CheckpointHSEApp
 {
@@ -27,13 +31,44 @@ namespace CheckpointHSEApp
         private double fps;
         private DispatcherTimer timer = null;
 
+        public  async Task<string> GetPersonNameAsync(Image image)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(@"http://localhost:5000");
+                MultipartFormDataContent form = new MultipartFormDataContent(Guid.NewGuid().ToString());
 
+                using (var stream = new MemoryStream())
+                {
+                    image.Save(stream, ImageFormat.Jpeg);
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    var content = new StreamContent(stream);
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                    content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                    { 
+                        Name = "file",
+                        FileName = "uploadedFile"
+                    };
+                    form.Add(content, "file");
+
+                    var response = await client.PostAsync(@"/Employees/RecognizePerson", form);
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
 
 
         public async void ChangePerson(object sender, EventArgs e)
         {
-            string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
-            if (info != "Нет информации")
+            string info = await GetPersonNameAsync(PersonPictureBox.Image);
+            if (!string.IsNullOrEmpty(info))
             {
                 //Функция на открытие двери
             }

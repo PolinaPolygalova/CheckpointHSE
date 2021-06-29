@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace CheckpointHSEWebServer.Controllers
@@ -9,10 +9,22 @@ namespace CheckpointHSEWebServer.Controllers
     [Route("[controller]")]
     public class EmployeesController : ControllerBase
     {
-        [HttpPost("RecognizePersons")]
-        public async Task<IEnumerable<string>> RecognizePersons([FromForm] IFormFile file)
+        [HttpPost("RecognizePerson")]
+        public async Task<string> RecognizePerson([FromForm] IFormFile file)
         {
-            return await EmployeesInfo.IdentifyFacesAsync(file);
+            if (file is null || EmployeesInfo.IsTrained == false)
+            {
+                return string.Empty;
+            }
+            try
+            {
+                return await EmployeesInfo.IdentifyFacesAsync(file);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return string.Empty;
+            }
         }
     }
 }
