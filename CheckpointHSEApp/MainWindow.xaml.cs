@@ -76,7 +76,7 @@ namespace CheckpointHSEApp
             }
 
             //Если доступных камер нет - кнопки запустить и остановить камеру заблокированы
-            if (webCams == null)
+            if ((webCams == null)||(CameraIDCombobox.SelectedIndex == -1))
             {
                 StartCameraButton.IsEnabled = false;
                 StopCameraButton.IsEnabled = false;
@@ -262,7 +262,7 @@ namespace CheckpointHSEApp
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(ChangePerson);
             //Временной промежуток - 1 секунда
-            timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+            timer.Interval = new TimeSpan(0, 0, 0, 5, 0);
             timer.Start();
         }
 
@@ -304,23 +304,21 @@ namespace CheckpointHSEApp
         private void CameraIDCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedCameraId = CameraIDCombobox.SelectedIndex;
+            if ((webCams != null) && (CameraIDCombobox.SelectedIndex != -1))
+            {
+                StartCameraButton.IsEnabled = true;
+                StopCameraButton.IsEnabled = true;
+            }
         }
 
 
         //Открытие выбранного порта или вывод сообщения об ошибке при сбое
         private void Open(SerialPort port, System.Windows.Controls.ComboBox box)
         {
-            try
-            {
-                port = new SerialPort(box.Text, 9600);
-                port.Open();
-                port.WriteLine("on");
-                box.IsEditable = false;
-            }
-            catch
-            {
-                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            port = new SerialPort(box.Text, 9600);
+            port.Open();
+            port.WriteLine("on");
+            box.IsEditable = false;
         }
 
 
@@ -329,15 +327,29 @@ namespace CheckpointHSEApp
         {
             if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
             {
-                new OpenGateWindow().ShowDialog();
-                Open(mySearialPort, PortsСomboBox);
+                try
+                {
+                    Open(mySearialPort, PortsСomboBox);
+                    new OpenGateWindow().ShowDialog();
+                }
+                catch
+                {
+                    System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             else
             {
                 if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    new OpenGateWindow().ShowDialog();
-                    Open(mySearialPort, PortsСomboBox);
+                    try
+                    {
+                        Open(mySearialPort, PortsСomboBox);
+                        new OpenGateWindow().ShowDialog();
+                    }
+                    catch
+                    {
+                        System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }
