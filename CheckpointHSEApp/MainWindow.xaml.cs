@@ -127,6 +127,8 @@ namespace CheckpointHSEApp
         //Обработка нажатия на кнопку "остановить камеру"
         private void StopCameraButton_Click(object sender, RoutedEventArgs e)
         {
+            timer.Stop();
+            ChangePerson(sender, e);
             try
             {
                 if (capture != null)
