@@ -294,8 +294,8 @@ namespace CheckpointHSEApp
         {
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(ChangePerson);
-            //Временной промежуток - 1 секунда
-            timer.Interval = new TimeSpan(0, 0, 0, 1, 0);
+            //Временной промежуток - 5 секунд
+            timer.Interval = new TimeSpan(0, 0, 0, 5, 0);
             timer.Start();
         }
 
