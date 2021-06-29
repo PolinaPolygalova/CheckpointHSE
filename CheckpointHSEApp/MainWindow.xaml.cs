@@ -10,6 +10,10 @@ using CascadeClassifier = Emgu.CV.CascadeClassifier; /*Определение л
 //Получение изображения с камеры
 using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.IO;
+using System.Drawing.Imaging;
 
 
 namespace CheckpointHSEApp
@@ -50,7 +54,37 @@ namespace CheckpointHSEApp
         //Таймер для введения временного промежутка между передачей изображения на функцию распознавания лиц
         private DispatcherTimer timer = null;
 
+        public  async Task<string> GetPersonNameAsync(Image image)
+        {
+            try
+            {
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(@"http://localhost:5000");
+                MultipartFormDataContent form = new MultipartFormDataContent(Guid.NewGuid().ToString());
 
+                using (var stream = new MemoryStream())
+                {
+                    image.Save(stream, ImageFormat.Jpeg);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    var content = new StreamContent(stream);
+                    content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+                    content.Headers.ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                    {
+                        Name = "file",
+                        FileName = "uploadedFile"
+                    };
+                    form.Add(content, "file");
+
+                    var response = await client.PostAsync(@"/Employees/RecognizePerson", form);
+                    return await response.Content.ReadAsStringAsync();
+                }
+
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
 
         //Главное окно
         public MainWindow()
@@ -238,9 +272,8 @@ namespace CheckpointHSEApp
         public async void ChangePerson(object sender, EventArgs e)
         {
             //Получение информации о человеке на изображении
-            //string info = await Task.Run(() => /*Сюда вставить нужную функцию - передается изображение, принимается строка*/(PersonPictureBox.Image));
-            string info = "";
-            if (info != "")
+            string info = await GetPersonNameAsync(PersonPictureBox.Image);
+            if (!string.IsNullOrEmpty(info))
             {
                 info += "\n\nПроход открыт";
                 //Функция на открытие двери
@@ -261,7 +294,7 @@ namespace CheckpointHSEApp
         {
             timer = new DispatcherTimer();
             timer.Tick += new EventHandler(ChangePerson);
-            //Временной промежуток - 1 секунда
+            //Временной промежуток - 5 секунд
             timer.Interval = new TimeSpan(0, 0, 0, 5, 0);
             timer.Start();
         }

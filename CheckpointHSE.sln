@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEServer", "CheckpointHSEServer\CheckpointHSEServer.csproj", "{E28B2538-D9A0-4DB1-AE81-902AEBF80088}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEClient", "CheckpointHSEClient\CheckpointHSEClient.csproj", "{F7501270-737F-4319-B8CF-F71C2082CE81}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckpointHSEApp", "CheckpointHSEApp\CheckpointHSEApp.csproj", "{92AD1C79-E819-4FCA-9343-479D2396916A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheckpointHSEWebServer", "CheckpointHSEWebServer\CheckpointHSEWebServer.csproj", "{C3C09525-68A2-40EE-A9CA-5072A22213B3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckpointHSEWebServer", "CheckpointHSEWebServer\CheckpointHSEWebServer.csproj", "{C3C09525-68A2-40EE-A9CA-5072A22213B3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E28B2538-D9A0-4DB1-AE81-902AEBF80088}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E28B2538-D9A0-4DB1-AE81-902AEBF80088}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E28B2538-D9A0-4DB1-AE81-902AEBF80088}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E28B2538-D9A0-4DB1-AE81-902AEBF80088}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F7501270-737F-4319-B8CF-F71C2082CE81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F7501270-737F-4319-B8CF-F71C2082CE81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F7501270-737F-4319-B8CF-F71C2082CE81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F7501270-737F-4319-B8CF-F71C2082CE81}.Release|Any CPU.Build.0 = Release|Any CPU
 		{92AD1C79-E819-4FCA-9343-479D2396916A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{92AD1C79-E819-4FCA-9343-479D2396916A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92AD1C79-E819-4FCA-9343-479D2396916A}.Release|Any CPU.ActiveCfg = Release|Any CPU

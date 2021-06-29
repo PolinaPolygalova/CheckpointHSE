@@ -27,7 +27,7 @@ namespace CheckpointHSEWebServer
         {
             services.AddControllers();
             services.AddDbContext<EmployeesContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("CheckpointHSEContext")));
+                options.UseSqlServer(Configuration.GetConnectionString("CheckpointHSEContext")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

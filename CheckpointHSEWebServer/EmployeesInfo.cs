@@ -24,9 +24,13 @@ namespace CheckpointHSEWebServer
 
         private static IFaceClient faceClient;
 
+        public static bool IsTrained { get; set; }
+
         public async static void Initialize(IServiceProvider serviceProvider)
         {
             Dictionary<string, string> employees;
+
+            IsTrained = false;
 
             using (var context = new EmployeesContext(
                 serviceProvider.GetRequiredService<
@@ -39,20 +43,8 @@ namespace CheckpointHSEWebServer
             IFaceClient client = Authenticate(ENDPOINT, SUBSCRIPTION_KEY);
             faceClient = client;
 
-            //// Detect - get features from faces.
-            //DetectFaceExtract(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
-            //// Find Similar - find a similar face from a list of faces.
-            //FindSimilar(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
-            //// Verify - compare two images if the same person or not.
-            //Verify(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
-
             // Identify - recognize a face(s) in a person group (a person group is created in this example).
             IdentifyInPersonGroup(client, RECOGNITION_MODEL3, employees).Wait();
-            //// LargePersonGroup - create, then get data.
-            //LargePersonGroup(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
-            //// Group faces - automatically group similar faces.
-            //Group(client, IMAGE_BASE_URL, RECOGNITION_MODEL3).Wait();
-            //// FaceList - create a face list, then get data
         }
 
         public static IFaceClient Authenticate(string endpoint, string key)
@@ -67,8 +59,6 @@ namespace CheckpointHSEWebServer
 
             EmployeesNames = new Dictionary<string, string>(employees.Count);
 
-            // A group photo that includes some of the persons you seek to identify from your dictionary.
-            string sourceImageFileName = "identification1.jpg";
             // Create a person group. 
             Console.WriteLine($"Create a person group ({personGroupId}).");
             await client.PersonGroup.CreateAsync(personGroupId, personGroupId, recognitionModel: recognitionModel);
@@ -111,6 +101,7 @@ namespace CheckpointHSEWebServer
                 if (trainingStatus.Status == TrainingStatusType.Succeeded) { break; }
             }
             Console.WriteLine();
+            IsTrained = true;
 
         }
         private static async Task<List<DetectedFace>> DetectFaceRecognize(IFormFile file)
@@ -123,13 +114,18 @@ namespace CheckpointHSEWebServer
             return detectedFaces.ToList();
         }
 
-        public static async Task<List<string>> IdentifyFacesAsync(IFormFile file)
+        public static async Task<string> IdentifyFacesAsync(IFormFile file)
         {
-            List<string> identifiedPersonNames = new List<string>();
+            string identifiedPersonName = string.Empty;
 
             List<Guid> sourceFaceIds = new List<Guid>();
             // Detect faces from source image url.
             List<DetectedFace> detectedFaces = await DetectFaceRecognize(file);
+
+            if (detectedFaces is null || detectedFaces.Count == 0)
+            {
+                return identifiedPersonName;
+            }
 
             // Add detected faceId to sourceFaceIds.
             foreach (var detectedFace in detectedFaces)
@@ -140,18 +136,18 @@ namespace CheckpointHSEWebServer
             // Identify the faces in a person group. 
             var identifyResults = await faceClient.Face.IdentifyAsync(sourceFaceIds, personGroupId);
 
-            foreach (var identifyResult in identifyResults)
+            if (identifyResults != null && identifyResults.Count == 1)
             {
-                if (identifyResult.Candidates != null && identifyResult.Candidates.Count > 0)
+                if (identifyResults[0].Candidates != null && identifyResults[0].Candidates.Count > 0)
                 {
-                    Person person = await faceClient.PersonGroupPerson.GetAsync(personGroupId, identifyResult.Candidates[0].PersonId);
-                    Console.WriteLine($"Person '{person.Name}' is identified for face in: {file.FileName} - {identifyResult.FaceId}," +
-                        $" confidence: {identifyResult.Candidates[0].Confidence}.");
-                    identifiedPersonNames.Add(person.Name);
+                    Person person = await faceClient.PersonGroupPerson.GetAsync(personGroupId, identifyResults[0].Candidates[0].PersonId);
+                    Console.WriteLine($"Person '{person.Name}' is identified for face in: {file.FileName} - {identifyResults[0].FaceId}," +
+                        $" confidence: {identifyResults[0].Candidates[0].Confidence}.");
+                    identifiedPersonName = person.Name;
                 }
             }
-            Console.WriteLine();
-            return identifiedPersonNames;
+            
+            return identifiedPersonName;
         }
     }    
 }
