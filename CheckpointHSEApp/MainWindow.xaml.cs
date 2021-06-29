@@ -277,7 +277,7 @@ namespace CheckpointHSEApp
             {
                 info += "\n\nПроход открыт";
                 //Функция на открытие двери
-                Open(mySearialPort, PortsСomboBox);
+                Open(PortsСomboBox);
             }
             else
             {
@@ -346,12 +346,22 @@ namespace CheckpointHSEApp
 
 
         //Открытие выбранного порта или вывод сообщения об ошибке при сбое
-        private void Open(SerialPort port, System.Windows.Controls.ComboBox box)
+        private bool Open(System.Windows.Controls.ComboBox box)
         {
-            port = new SerialPort(box.Text, 9600);
-            port.Open();
-            port.WriteLine("on");
-            box.IsEditable = false;
+            bool flag = true;
+            try
+            {
+                mySearialPort = new SerialPort(box.Text, 9600);
+                mySearialPort.Open();
+                mySearialPort.Write("on");
+                box.IsEditable = false;
+            }
+            catch
+            {
+                flag = false;
+                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            return flag;
         }
 
 
@@ -360,29 +370,15 @@ namespace CheckpointHSEApp
         {
             if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
             {
-                try
-                {
-                    Open(mySearialPort, PortsСomboBox);
+                if(Open(PortsСomboBox))
                     new OpenGateWindow().ShowDialog();
-                }
-                catch
-                {
-                    System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
             }
             else
             {
                 if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    try
-                    {
-                        Open(mySearialPort, PortsСomboBox);
+                    if (Open(PortsСomboBox))
                         new OpenGateWindow().ShowDialog();
-                    }
-                    catch
-                    {
-                        System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
                 }
             }
         }
