@@ -110,7 +110,7 @@ namespace CheckpointHSEApp
             }
 
             //Если доступных камер нет - кнопки запустить и остановить камеру заблокированы
-            if (webCams == null)
+            if ((webCams == null)||(CameraIDCombobox.SelectedIndex == -1))
             {
                 StartCameraButton.IsEnabled = false;
                 StopCameraButton.IsEnabled = false;
@@ -277,7 +277,7 @@ namespace CheckpointHSEApp
             {
                 info += "\n\nПроход открыт";
                 //Функция на открытие двери
-                Open(mySearialPort, PortsСomboBox);
+                Open(PortsСomboBox);
             }
             else
             {
@@ -337,23 +337,31 @@ namespace CheckpointHSEApp
         private void CameraIDCombobox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
         {
             selectedCameraId = CameraIDCombobox.SelectedIndex;
+            if ((webCams != null) && (CameraIDCombobox.SelectedIndex != -1))
+            {
+                StartCameraButton.IsEnabled = true;
+                StopCameraButton.IsEnabled = true;
+            }
         }
 
 
         //Открытие выбранного порта или вывод сообщения об ошибке при сбое
-        private void Open(SerialPort port, System.Windows.Controls.ComboBox box)
+        private bool Open(System.Windows.Controls.ComboBox box)
         {
+            bool flag = true;
             try
             {
-                port = new SerialPort(box.Text, 9600);
-                port.Open();
-                port.WriteLine("on");
+                mySearialPort = new SerialPort(box.Text, 9600);
+                mySearialPort.Open();
+                mySearialPort.Write("on");
                 box.IsEditable = false;
             }
             catch
             {
+                flag = false;
                 System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            return flag;
         }
 
 
@@ -362,15 +370,15 @@ namespace CheckpointHSEApp
         {
             if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
             {
-                new OpenGateWindow().ShowDialog();
-                Open(mySearialPort, PortsСomboBox);
+                if(Open(PortsСomboBox))
+                    new OpenGateWindow().ShowDialog();
             }
             else
             {
                 if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    new OpenGateWindow().ShowDialog();
-                    Open(mySearialPort, PortsСomboBox);
+                    if (Open(PortsСomboBox))
+                        new OpenGateWindow().ShowDialog();
                 }
             }
         }
