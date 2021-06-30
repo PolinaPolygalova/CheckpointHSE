@@ -124,7 +124,7 @@ namespace CheckpointHSEApp
             }
 
             //Если доступных портов нет - кнопка открыть проход заблокирована
-            if (PortsСomboBox == null)
+            if (ports.Length == 0)
             {
                 GateOpenButton.IsEnabled = false;
             }
@@ -189,7 +189,7 @@ namespace CheckpointHSEApp
         {
             try
             {
-                AdditionalInfoWindow window = new AdditionalInfoWindow(PersonPictureBox.Image, PersonInfoLabel.Content.ToString());
+                AdditionalInfoWindow window = new AdditionalInfoWindow(PersonPictureBox.Image, PersonInfoLabel.Content.ToString(), ports);
                 window.Owner = this;
                 window.ShowDialog();
             }
@@ -211,7 +211,7 @@ namespace CheckpointHSEApp
             else
             {
                 //Выход из приложения
-                System.Environment.Exit(0);
+                Environment.Exit(0);
             }
         }
 
@@ -346,22 +346,11 @@ namespace CheckpointHSEApp
 
 
         //Открытие выбранного порта или вывод сообщения об ошибке при сбое
-        private bool Open(System.Windows.Controls.ComboBox box)
+        private void Open(System.Windows.Controls.ComboBox box)
         {
-            bool flag = true;
-            try
-            {
-                mySearialPort = new SerialPort(box.Text, 9600);
-                mySearialPort.Open();
-                mySearialPort.Write("on");
-                box.IsEditable = false;
-            }
-            catch
-            {
-                flag = false;
-                System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            return flag;
+            mySearialPort = new SerialPort(box.Text, 9600);
+            mySearialPort.Open();
+            mySearialPort.WriteLine("on");
         }
 
 
@@ -370,15 +359,29 @@ namespace CheckpointHSEApp
         {
             if (PortsСomboBox.SelectedIndex == CameraIDCombobox.SelectedIndex)
             {
-                if(Open(PortsСomboBox))
+                try
+                {
+                    Open(PortsСomboBox);
                     new OpenGateWindow().ShowDialog();
+                }
+                catch
+                {
+                    System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
             else
             {
                 if (System.Windows.MessageBox.Show("Камера и турникет не совпадают, все равно открыть проход?", "Вопрос", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
-                    if (Open(PortsСomboBox))
+                    try
+                    {
+                        Open(PortsСomboBox);
                         new OpenGateWindow().ShowDialog();
+                    }
+                    catch
+                    {
+                        System.Windows.MessageBox.Show("Ошибка подключения турникета!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }

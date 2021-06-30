@@ -16,7 +16,7 @@ namespace CheckpointHSEApp
         //Создание нового PictureBox
         private PictureBox PersonPictureBox = new PictureBox();
 
-        public AdditionalInfoWindow(System.Drawing.Image image, string info)
+        public AdditionalInfoWindow(System.Drawing.Image image, string info, string[] ports)
         {
             InitializeComponent();
 
@@ -28,6 +28,11 @@ namespace CheckpointHSEApp
             //Добавление информации и изображения на форму
             PersonPictureBox.Image = image;
             InfoLabel.Content = info;
+
+            if (ports.Length == 0)
+            {
+                GateOpenButton.IsEnabled = false;
+            }
         }
 
 
